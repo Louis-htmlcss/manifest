@@ -1,0 +1,31 @@
+name: Build Evolution X
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+        
+    - name: Clone repository
+      run: |
+        git clone https://github.com/Evolution-X/manifest.git
+        cd manifest
+        
+    - name: Sync repository
+      run: |
+        repo init -u https://github.com/Evolution-X/manifest -b udc --git-lfs
+        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+        
+    - name: Setup build environment
+      run: . build/envsetup.sh
+      
+    - name: Lunch target
+      run: lunch lineage_codename-user
+      
+    - name: Start compilation
+      run: m evolution
