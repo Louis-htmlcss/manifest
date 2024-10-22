@@ -1,32 +1,49 @@
 name: Build Evolution X
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Install repo
+    - name: Set up Git
+      uses: actions/checkout@v3
+
+    - name: Install Required Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install repo
-    - name: Clone repository
+        sudo apt-get install -y openjdk-11-jdk wget git-core gnupg flex bison gperf build-essential \
+        zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 \
+        lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache \
+        libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig \
+        repo git-lfs
+
+    - name: Initialize Local Repository
       run: |
-        git clone https://github.com/Evolution-X/manifest.git
-        cd manifest
-        
-    - name: Sync repository
-      run: |
+        git lfs install
         repo init -u https://github.com/Evolution-X/manifest -b udc --git-lfs
+
+    - name: Sync Up Repository
+      run: |
         repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
-        
-    - name: Setup build environment
-      run: . build/envsetup.sh
-      
-    - name: Lunch target
-      run: lunch lineage_codename-user
-      
-    - name: Start compilation
-      run: m evolution
+
+    - name: Set Up Build Environment
+      run: |
+        source build/envsetup.sh
+        lunch lineage_lisa-user
+
+    - name: Start Compiling
+      run: |
+        m evolution
+
+    - name: Upload Build Artifacts
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: EvolutionX-Build
+        path: out/target/product/lisa/*.img
