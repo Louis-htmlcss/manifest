@@ -1,9 +1,7 @@
 name: Build Evolution X
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build:
