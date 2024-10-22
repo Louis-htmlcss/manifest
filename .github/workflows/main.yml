@@ -25,8 +25,8 @@ jobs:
 
     - name: Initialize Local Repository
       run: |
-        git lfs install
-        repo init -u https://github.com/Evolution-X/manifest -b udc --git-lfs
+        git lfs install  # Installe Git LFS
+        repo init -u https://github.com/Evolution-X/manifest -b udc
 
     - name: Sync Up Repository
       run: |
